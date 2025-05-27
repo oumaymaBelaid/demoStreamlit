@@ -61,36 +61,58 @@ if selected_features:
     st.subheader("Moyennes par cluster")
     st.write(df_copy.groupby('Cluster')[selected_features].mean())
 
-    #  Stratégie marketing simple
-    st.subheader("Stratégie marketing proposée")
+   #  Stratégie marketing détaillée selon les clusters
+st.subheader("Stratégie marketing par cluster")
 
-    for cluster in range(n_clusters):
-        st.markdown(f"###  Cluster {cluster}")
-        cluster_data = df_copy[df_copy['Cluster'] == cluster][selected_features].mean()
+# Description manuelle des clusters 
+cluster_strategies = {
+    0: {
+        "label": "Riches économes",
+        "description": "Revenu élevé, dépenses faibles",
+        "marketing": [
+            "💼 Promouvoir des placements ou services haut de gamme mais utiles",
+            "📈 Mettre en avant la qualité/prix plutôt que le luxe",
+        ]
+    },
+    1: {
+        "label": "Dépensiers moyens",
+        "description": "Âge moyen, dépenses élevées",
+        "marketing": [
+            "🎯 Proposer des offres personnalisées pour les fidéliser",
+            "🎁 Cartes de fidélité, offres groupées et services réguliers",
+        ]
+    },
+    2: {
+        "label": "Jeunes dépensiers",
+        "description": "Jeunes, dépenses élevées",
+        "marketing": [
+            "📱 Campagnes sur TikTok, Instagram, etc.",
+            "🔥 Offres flash, expériences fun et tendance",
+        ]
+    },
+    3: {
+        "label": "Faible pouvoir d'achat",
+        "description": "Revenu faible, dépenses faibles",
+        "marketing": [
+            "💸 Promos et bons de réduction",
+            "🛍️ Offres économiques et packs d'entrée de gamme",
+        ]
+    },
+    4: {
+        "label": "Cibles premium",
+        "description": "Revenu élevé, dépenses élevées",
+        "marketing": [
+            "🌟 Produits de luxe, expériences VIP",
+            "🔒 Services personnalisés et exclusifs",
+        ]
+    },
+}
 
-        strategies = []
-
-        # Exemple simple de règles
-        if 'Annual Income (k$)' in selected_features:
-            if cluster_data['Annual Income (k$)'] > 70:
-                strategies.append("🛍️ Offrir des produits de luxe")
-            elif cluster_data['Annual Income (k$)'] < 40:
-                strategies.append("💸 Proposer des réductions")
-
-        if 'Age' in selected_features:
-            if cluster_data['Age'] < 25:
-                strategies.append("📱 Cibler via les réseaux sociaux")
-            elif cluster_data['Age'] > 50:
-                strategies.append("📧 Utiliser l'emailing ou les appels")
-
-        if 'Spending Score (1-100)' in selected_features:
-            if cluster_data['Spending Score (1-100)'] > 70:
-                strategies.append("🎁 Fidéliser avec des avantages exclusifs")
-            elif cluster_data['Spending Score (1-100)'] < 40:
-                strategies.append("📣 Relancer avec des offres personnalisées")
-
-        for s in strategies:
-            st.write("-", s)
-
-        if not strategies:
-            st.write("Aucune stratégie spécifique")
+# Affichage
+for cluster_id in sorted(df_copy['Cluster'].unique()):
+    data = cluster_strategies.get(cluster_id, {})
+    st.markdown(f"###  Cluster {cluster_id} : {data.get('label', 'Inconnu')}")
+    st.write(f"**Profil :** {data.get('description', 'Non défini')}")
+    st.write("**Stratégies proposées :**")
+    for strategy in data.get("marketing", []):
+        st.write("-", strategy)
